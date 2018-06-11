@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Horizontaal</title>
+    <script src="https://code.jquery.com/jquery-3.0.0.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
+
+    <link rel="stylesheet" href="assets/bootstrap.min.css"/>
+    <link href="assets/font-awesome.min.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+    <link rel="stylesheet" href="assets/drawerJs.css"/>
+    <script src="assets/drawerJs.standalone.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Comfortaa:300,400,700');
+        html,body{
+            height: 100%;
+            width: 100%;
+        }
+        body{
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            overflow: hidden !important;
+            background: url('assets/background.jpg');
+            background-size: cover;
+            background-position: center center;
+        }
+        .toolbar-placeholder-bottom{
+            bottom: -10px !important;
+            left: -10px !important;
+            right: -10px !important;
+        }
+        #redactor-drawer-box{
+            border: 10px solid #333 !important;
+        }
+        .editable-canvas-image{
+            border: 10px solid #333 !important;
+        }
+        .toolbar-placeholder-top{
+            right: -10px !important;
+            left: -10px !important;
+            top: -10px !important;
+        }
+        .editable-canvas-toolbar.toolbar-scrollable.toolbar-horizontal .toolbar-content-wrapper{
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .colorpicker-control span.color-indicator{
+            top: 3px !important;
+        }
+        #canvas-editor{
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .editable-canvas-opacity{
+            display: none !important;
+        }
+        .drawer-instance-container:not(.touch) .toolbar-button:not(.dragging):not(.disabled) a:hover{
+           background: rgb(238, 114, 3);
+        }
+        .toolbar-button a{
+            line-height: 50px !important;
+            font-size: 20px !important;
+        }
+        .toolbar-button{
+            width: 50px !important;
+            height: 50px !important;
+        }
+        .toolbar-button .fa-line:before{
+            font-size: 25px !important;
+        }
+        .left{
+            flex: 1;
+            height: 100%;
+        }
+        .right{
+            flex: 3;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        .content{
+            background: #fff;
+            height: 100%;
+            padding: 50px;
+            padding-top: 30px;
+            box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.10);
+        }
+        @media only screen and (max-width: 1700px) {
+          .content{
+            padding: 30px;
+            padding-top: 15px;
+          }
+        }
+/*        #redactor-drawer-box{
+            top: inherit !important;
+            width: 1280px !important;
+            height: 720px !important;
+        }*/
+        #logo{
+            width: 200px;
+            margin: 0 auto;
+            display: block;
+            margin-bottom: 50px;
+        }
+        .item{
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dadada;
+            height: 100px;
+            display: flex;
+            align-items: center;
+        }
+        @media only screen and (max-width: 1700px) {
+          .item{
+            height: 85px;
+          }
+        }
+        .item i{
+            font-size: 40px;
+            float: left;
+            color: #ee7203;
+            display: flex;
+            align-items: center;
+            width: 70px;
+            font-size: 4vh;
+        }
+            @media only screen and (max-width: 1700px) {
+              .item i{
+                width: 55px;
+              }
+            }
+        .item span{
+            font-weight: 100;
+            line-height: 30px;
+            font-family: 'Comfortaa', cursive;
+            font-style: italic;
+            font-size: 16px;
+        }
+        @media only screen and (max-width: 1700px) {
+          .item span{
+            font-size: 14px;
+            line-height: 25px;
+          }
+        }
+        .item .fa-line:before{
+            position: relative;
+            content: "/";
+            font-size: 40px !important;
+            left: 10px;
+        }
+        .intro{
+            margin-bottom: 40px;
+        }
+        @media only screen and (max-width: 1700px) {
+          .intro{
+            margin-bottom: 20px;
+          }
+        }
+        .intro p{
+            text-align: center;
+            line-height: 30px;
+            font-weight: 400;
+            font-family: 'Comfortaa', cursive;
+            font-size: 16px;
+        }
+        @media only screen and (max-width: 1700px) {
+          .intro p{
+            font-size: 14px;
+            line-height: 25px;
+          }
+        }
+        h1{
+            font-family: 'Comfortaa', cursive;
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 4vh;
+        }
+        .scroll-to-begin-btn{
+          display: none !important;
+        }
+        .scroll-to-end-btn{
+          display: none !important;
+        }
+        .toolbar-horizontal.toolbar-scrollable.show-scroll{
+          padding: 0px !important;
+        }
+        .change{
+          position: absolute;
+          top: 0;
+          left: 0;
+          background: #ee7203;
+        }
+        #change-img{
+          width: 60px;
+          padding: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="left">
+        <div class="content">
+
+            <a href="vertical.html" class="change">
+              <img src="assets/phone.svg" id="change-img">
+            </a>
+
+            <h1>Prodiz editor</h1>
+
+            <div class="intro">
+                <p>Maak hier je eigen fragment. Voeg je eigen achtergrondafbeelding toe en vul je eigen fragment met tekst, vormen en afbeelding(en). Een element verwijderen of kopieren kan via de rechtermuisknop.  </p>
+            </div>
+            <div class="legenda">
+                <div class="item">
+                    <div class="icon">
+                      <i class="fa fa-font"></i>
+                    </div>
+                    <span>Voeg hier je tekst toe. Dubbelklik op een tekst om deze te bewerken.</span>
+                </div>
+                <div class="item">
+                    <div class="icon">
+                      <i class="fa fa-stop"></i>
+                    </div>
+                    <span>Voeg hier een blok toe. Klik op het blok op de kleur aan te passen of een rand toe te voegen.</span>
+                </div>
+                <div class="item">
+                    <div class="icon">
+                      <i class="fa fa-circle"></i>
+                    </div>
+                    <span>Voeg hier een cirkel toe. Klik op het blok op de kleur aan te passen of een rand toe te voegen.</span>
+                </div>
+                <div class="item">
+                    <div class="icon">
+                      <i class="fa fa-images"></i>
+                    </div>
+                    <span>Voeg hier een afbeelding toe.</span>
+                </div>
+                <div class="item">
+                    <div class="icon">
+                      <i class="fa fa-image"></i>
+                    </div>
+                    <span>Voeg hier een achtergrond afbeelding toe.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="right">
+        <div id="canvas-editor">
+    </div>
+    
+    
+</div>
+
+<script>
+var drawerPlugins = [
+// Drawing tools
+'Text',
+'Rectangle',
+'Circle',
+'Image',
+'BackgroundImage',
+
+// Drawing options
+//'ColorHtml5',
+'Color',
+'ShapeBorder',
+'BrushSize',
+'ShapeContextMenu',
+'ToggleVisibilityButton',
+'OvercanvasPopup',
+'OpenPopupButton',
+'OpacityOption',
+'LineWidth',
+'StrokeWidth',
+
+'TextLineHeight',
+'TextAlign',
+'TextFontFamily',
+'TextFontSize',
+'TextFontWeight',
+'TextFontStyle',
+'TextDecoration',
+'TextColor',
+'TextBackgroundColor'
+];
+
+var localizedTexts = {
+  'Add Drawer': 'Add Drawer',
+  'Insert Drawer': 'Insert Drawer',
+  'Insert': 'Insert',
+  'Free drawing mode': 'Free drawing mode',
+  'SimpleWhiteEraser': 'SimpleWhiteEraser',
+  'Eraser': 'Eraser',
+  'Delete this canvas': 'Delete this canvas',
+  'Are you sure want to delete this canvas?': 'Are you sure want to delete this canvas?',
+
+  // canvas properties popup
+  'Size (px)': 'Size (px)',
+  'Position': 'Position',
+  'Inline': 'Inline',
+  'Left': 'Left',
+  'Center': 'Center',
+  'Right': 'Right',
+  'Floating': 'Floating',
+  'Canvas properties': 'Canvas properties',
+  'Background': 'Achtergrond',
+  'transparent': 'transparent',
+  'Cancel': 'Cancel',
+  'Save': 'Save',
+  'Fill': 'Vullen',
+
+
+
+  // Fullscreen plugin
+  'Enter fullscreen mode': 'Enter fullscreen mode',
+  'Exit fullscreen mode': 'Exit fullscreen mode',
+
+  // shape context menu plugin
+  'Bring forward': 'Naar voren',
+  'Send backwards': 'Naar achter',
+  'Bring to front': 'Naar voorgrond',
+  'Send to back': 'Naar achtergrond',
+  'Duplicate': 'Kopieren',
+  'Remove': 'Verwijderen',
+
+  // brush size plugin
+  'Size:': 'Grootte:',
+
+  // colorpicker plugin
+  'Fill:': 'Vullen:',
+  'Transparent': 'Transparant',
+
+  // shape border plugin
+  'Border:': 'Rand:',
+  'None': 'Geen',
+
+  // arrow plugin
+  'Draw an arrow': 'Draw an arrow',
+  'Draw a two-sided arrow': 'Draw a two-sided arrow',
+  'Lines and arrows': 'Lijn',
+
+  // circle plugin
+  'Draw a circle': 'Teken een cirkel',
+
+  // line plugin
+  'Draw a line': 'Teken een lijn',
+
+  // rectangle plugin
+  'Draw a rectangle': 'Teken een rechthoek',
+
+  // triangle plugin
+  'Draw a triangle': 'Draw a triangle',
+
+  // polygon plugin
+  'Draw a Polygon': 'Draw a Polygon',
+  'Stop drawing a polygon': 'Stop drawing a polygon (esc)',
+  'Click to start a new line': 'Click to start a new line',
+
+  // text plugin
+  'Draw a text': 'Tekst',
+  'Click to place a text': 'Klik om te beginnen met schrijven',
+  'Font:': 'Lettertype:',
+
+  // movable floating mode plugin
+  'Move canvas': 'Move canvas',
+
+  // base shape
+  'Click to start drawing a ': 'Klik om te starten met een ',
+
+  //Image
+  'Insert an image': 'Voeg een afbeelding toe',
+  'No file was selected!': 'Geen bestand geselecteerd!',
+  'Incorrect file type': 'Verkeerd bestandstype',
+  'Bestand is te groot!. Maximale bestandsgrootte is ': 'Bestand is te groot!. Maximale bestandsgrootte is ',
+  'Image failed to create!': 'Image failed to create!',        
+  //Image Background
+  'Insert a background image': 'Voeg een achtergrondafbeelding toe'
+};
+
+
+var drawerPluginConfig = {
+ShapeBorder: {
+    color: 'rgba(0, 0, 0, 0)'
+},
+Pencil: {
+    cursorUrl: 'pencil',
+    brushSize: 3
+},
+Eraser: {
+    brushSize: 5
+},
+Circle: {
+    centeringMode: 'normal'
+},
+Rectangle: {
+    centeringMode: 'normal'
+},
+Triangle: {
+    centeringMode: 'normal'
+},
+Text: {
+    fonts: {
+        'Georgia': 'Georgia, serif',
+        'Palatino': "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+        'Times New Roman': "'Times New Roman', Times, serif",
+
+        'Arial': 'Arial, Helvetica, sans-serif',
+        'Arial Black': "'Arial Black', Gadget, sans-serif",
+        'Comic Sans MS': "'Comic Sans MS', cursive, sans-serif",
+        'Impact': 'Impact, Charcoal, sans-serif',
+        'Lucida Grande': "'Lucida Sans Unicode', 'Lucida Grande', sans-serif",
+        'Tahoma': 'Tahoma, Geneva, sans-serif',
+        'Trebuchet MS': "'Trebuchet MS', Helvetica, sans-serif",
+        'Verdana': 'Verdana, Geneva, sans-serif',
+
+        'Courier New': "'Courier New', Courier, monospace",
+        'Lucida Console': "'Lucida Console', Monaco, monospace"
+    },
+    defaultFont: 'Arial',
+    editIconMode: false,
+    defaultValues: {
+        fontSize: 24,
+        lineHeight: 1,
+        textFontWeight: 'bold'
+    },
+    predefined: {
+        fontSize: [8, 12, 14, 16, 24, 32, 40, 72],
+        lineHeight: [1, 2, 3, 4, 6]
+    }
+},
+ShapeContextMenu: {
+    position: {
+        touch: 'cursor',
+        mouse: 'cursor'
+    }
+},
+Zoom: {
+    enabled: false,
+    showZoomTooltip: true,
+    useWheelEvents: true,
+    zoomStep: 1.05,
+    defaultZoom: 1,
+    maxZoom: 32,
+    minZoom: 1,
+    smoothnessOfWheel: 0,
+    enableMove: true,
+    enableWhenNoActiveTool: true,
+    enableButton: true
+},
+Image: {
+    scaleDownLargeImage: true,
+    maxImageSizeKb: 1024,
+    cropIsActive: true,
+},
+BackgroundImage: {
+    scaleDownLargeImage: false,
+    maxImageSizeKb: 2024, 
+    acceptedMIMETypes: ['image/jpeg', 'image/png', 'image/gif'],
+    imagePosition: 'stretch',
+    dynamicRepositionImage: true,
+    dynamicRepositionImageThrottle: 100,
+    cropIsActive: false
+}
+};
+
+var canvas = new DrawerJs.Drawer(null, {
+toolbarSize: 35,
+toolbarSizeTouch: 43,
+tooltipCss: {
+    color: 'white',
+    background: 'black'
+},
+backgroundCss: 'transparent',
+activeColor: '#ee7203',
+canvasProperties: {
+    selectionColor: 'rgba(255, 255, 255, 0.3)',
+    selectionDashArray: [3, 8],
+    selectionBorderColor: '#5f5f5f'
+},
+objectControls: {
+    borderColor: 'rgba(102,153,255,0.75)',
+    borderOpacityWhenMoving: 0.4,
+    cornerColor: 'rgba(102,153,255,0.5)',
+    cornerSize: 12,
+    hasBorders: true
+},
+objectControlsTouch: {
+    borderColor: 'rgba(102,153,255,0.75)',
+    borderOpacityWhenMoving: 0.4,
+    cornerColor: 'rgba(102,153,255,0.5)',
+    cornerSize: 20,
+    hasBorders: true
+},
+plugins: drawerPlugins,
+texts: localizedTexts,
+pluginsConfig: drawerPluginConfig,
+defaultActivePlugin: { name: 'Pencil', mode: 'onNew' },
+//defaultImageUrl: '/Client/vendor/DrawerJs/images/drawer.jpg',
+transparentBackground: false,
+exitOnOutsideClick: false,
+toolbars: {
+    drawingTools: {
+        position: 'top',
+        positionType: 'outside',
+        compactType: 'scrollable',
+        hidden: false,
+        toggleVisibilityButton: false,
+        fullscreenMode: {
+            position: 'top',
+            hidden: false,
+            toggleVisibilityButton: false
+        }
+    },
+    toolOptions: {
+        position: 'bottom',
+        positionType: 'outside',
+        compactType: 'scrollable',
+        hidden: false,
+        toggleVisibilityButton: false,
+        fullscreenMode: {
+            position: 'bottom',
+            compactType: 'popup',
+            hidden: false,
+            toggleVisibilityButton: false
+        }
+    },
+    settings: {
+        position: 'right',
+        positionType: 'outside',
+        compactType: 'scrollable',
+        hidden: true,
+        toggleVisibilityButton: false,
+        fullscreenMode: {
+            position: 'bottom',
+            hidden: true,
+            toggleVisibilityButton: true
+        }
+    }
+}
+}, getCanvasWidth(), getCanvasHeight());
+
+function getCanvasWidth() {
+var viewportWidth = $(document).width();
+var canvasWidth = '89%';
+return canvasWidth;
+}
+
+function getCanvasHeight() {
+var viewportHeight = $(document).height();
+var height = '76%';
+return height;
+}
+
+$(document).ready(function () {
+$('#canvas-editor').append(canvas.getHtml());
+canvas.onInsert();
+canvas.api.startEditing();
+});
+
+$(window).resize(function () {
+canvas.api.setSize(getCanvasWidth(), getCanvasHeight());
+});
+
+
+
+
+
+</script>
+
+
+</body>
+</html>
